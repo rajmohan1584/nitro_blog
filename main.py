@@ -1,7 +1,10 @@
 from fastapi import FastAPI
+from fastapi.requests import Request
 from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.templating import Jinja2Templates
 
 app = FastAPI()
+templates = Jinja2Templates(directory="templates")
 
 posts: list[dict] = [
     {
@@ -21,9 +24,16 @@ posts: list[dict] = [
 ]
 
 
-@app.get("/")
-def home() -> JSONResponse:
+@app.get("/home_json", response_class=JSONResponse, include_in_schema=False)
+def home_json() -> JSONResponse:
     return {"message": "Hello, FastAPI Nitro Blog!"}
+
+
+@app.get("/home", response_class=HTMLResponse)
+def home(request: Request) -> HTMLResponse:
+    return templates.TemplateResponse(
+        request, "home.html", {"posts": posts, "title": "Home"}
+    )
 
 
 @app.get("/html", response_class=HTMLResponse, include_in_schema=False)
