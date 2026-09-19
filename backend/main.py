@@ -1,9 +1,18 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.requests import Request
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.templating import Jinja2Templates
 
 app = FastAPI()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 templates = Jinja2Templates(directory="templates")
 
 posts: list[dict] = [
@@ -43,4 +52,4 @@ def html_response() -> HTMLResponse:
 
 @app.get("/posts", response_class=JSONResponse)
 def get_posts() -> JSONResponse:
-    return {"data": posts}
+    return JSONResponse(content=posts, status_code=200)
