@@ -2,14 +2,19 @@ import Image from "next/image";
 
 export default function BlogCard({ post }: { post: any }) {
   return (
-    <div className="flex flex-col gap-4">
-      <h2 className="text-2xl font-bold">{post.title}</h2>
-      <p className="text-sm text-gray-500">{post.description}</p>
-      <p className="text-sm text-gray-500">{post.content}</p>
-      <p className="text-sm text-gray-500">{post.created_at}</p>
-      <p className="text-sm text-gray-500">{post.updated_at}</p>
-      <p className="text-sm text-gray-500">{post.author}</p>
-      <p className="text-sm text-gray-500">{post.category}</p>
+    <div className="flex h-[300px] w-full flex-col overflow-hidden rounded-lg shadow-md border border-zinc-200">
+
+      {/* Header */}
+      <div className="border-b border-zinc-200 px-4 py-3">{post.title}</div>
+
+
+      {/* Body */}
+      <div className="flex-1 px-4 py-3 text-sm text-zinc-600">{post.content}</div>
+
+
+      {/* Footer */}
+      <div className="border-t border-zinc-200 px-4 py-2 text-xs text-zinc-500">{post.author}</div>
+
     </div>
   );
 }
