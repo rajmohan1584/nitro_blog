@@ -1,8 +1,16 @@
+"use client";
 import Image from "next/image";
+import { useTheme } from "@/providers/ThemeProvider";
+import Button from "./Button";
 
 export default function TitleBar() {
+  const { theme, toggleTheme } = useTheme();
+
   return (
-    <header className="flex w-full items-center justify-between border-b border-zinc-200 bg-white px-6 py-3">
+    <header
+      className="flex w-full items-center justify-between 
+                 border-b border-zinc-200 bg-white dark:bg-zinc-900 dark:border-zinc-800 
+                 px-6 py-3 text-zinc-900 dark:text-zinc-100">
       {/* Left */}
       <div className="flex items-center gap-3">
         <Image
@@ -12,20 +20,16 @@ export default function TitleBar() {
           height={40}
         />
 
-        <span className="text-xl font-semibold text-zinc-900">
+        <span className="text-xl font-semibold">
           Nitro Blog
         </span>
       </div>
 
       {/* Right */}
       <div className="flex items-center gap-3">
-        <button className="rounded-md px-4 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-100">
-          Login
-        </button>
-
-        <button className="rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-700">
-          Register
-        </button>
+        <Button text={theme === "light" ? "Dark" : "Light"} onClick={toggleTheme} />
+        <Button text="Login" onClick={() => {}} />
+        <Button text="Register" onClick={() => {}} />
       </div>
     </header>
   );
