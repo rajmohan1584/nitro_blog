@@ -53,3 +53,12 @@ def html_response() -> HTMLResponse:
 @app.get("/posts", response_class=JSONResponse)
 def get_posts() -> JSONResponse:
     return JSONResponse(content=posts, status_code=200)
+
+
+@app.get("/posts/{post_id}", response_class=JSONResponse)
+def get_post(request: Request, post_id: int) -> JSONResponse:
+    post = next((post for post in posts if post["id"] == post_id), None)
+    if post:
+        return JSONResponse(content=post, status_code=200)
+    else:
+        return JSONResponse(content={"message": "Post not found"}, status_code=404)

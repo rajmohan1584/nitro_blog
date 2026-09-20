@@ -1,10 +1,12 @@
 "use client";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useTheme } from "@/providers/ThemeProvider";
 import Button from "./Button";
 
 export default function TitleBar() {
   const { theme, toggleTheme } = useTheme();
+  const router = useRouter();
 
   return (
     <header
@@ -23,6 +25,8 @@ export default function TitleBar() {
         <span className="text-xl font-semibold">
           Nitro Blog
         </span>
+
+        <Button text="Home" onClick={() => router.push("/")} />
       </div>
 
       {/* Right */}
