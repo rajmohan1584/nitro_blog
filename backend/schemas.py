@@ -1,12 +1,11 @@
 # from typing import Optional
 
-from pydantic import BaseModel, ConfigDict, Field
+from datetime import datetime
+from pydantic import BaseModel, ConfigDict, Field, EmailStr
 
 
 class PostBase(BaseModel):
-    title: str = Field(
-        min_length=1, max_length=100, description="The title of the post"
-    )
+    title: str = Field(min_length=1, max_length=100, description="The title of the post")
     content: str = Field(min_length=1, description="The content of the post")
     author: str = Field(min_length=1, description="The author of the post")
 
