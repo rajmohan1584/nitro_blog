@@ -1,8 +1,11 @@
-from fastapi import FastAPI
+from datetime import datetime, timezone
+
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.requests import Request
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.templating import Jinja2Templates
+from schemas import PostCreate, PostResponse
 
 app = FastAPI()
 app.add_middleware(
@@ -50,15 +53,29 @@ def html_response() -> HTMLResponse:
     return HTMLResponse(content="<h1>Hello, FastAPI Nitro Blog!</h1>", status_code=200)
 
 
-@app.get("/posts", response_class=JSONResponse)
-def get_posts() -> JSONResponse:
-    return JSONResponse(content=posts, status_code=200)
+@app.get("/posts", response_model=list[PostResponse])
+def get_posts() -> list[PostResponse]:
+    return [PostResponse.model_validate(post) for post in posts]
 
 
-@app.get("/posts/{post_id}", response_class=JSONResponse)
-def get_post(request: Request, post_id: int) -> JSONResponse:
+@app.get("/posts/{post_id}", response_model=PostResponse)
+def get_post(request: Request, post_id: int) -> PostResponse:
     post = next((post for post in posts if post["id"] == post_id), None)
     if post:
-        return JSONResponse(content=post, status_code=200)
+        return PostResponse.model_validate(post)
     else:
-        return JSONResponse(content={"message": "Post not found"}, status_code=404)
+        raise HTTPException(status_code=404, detail="Post not found")
+
+
+@app.post("/posts", response_model=PostResponse)
+def create_post(request: Request, post: PostCreate) -> PostResponse:
+    new_id = max(post["id"] for post in posts) + 1 if posts else 1
+    new_post = PostResponse(
+        id=new_id,
+        title=post.title,
+        content=post.content,
+        author=post.author,
+        date_posted=datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S"),
+    )
+    posts.append(new_post.to_dict())
+    return new_post
