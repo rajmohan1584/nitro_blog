@@ -1,8 +1,6 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import (
-    AsyncSession,
     DeclarativeBase,
-    async_sessionmaker,
     sessionmaker,
 )
 
@@ -12,15 +10,13 @@ engine = create_engine(SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-AsyncSessionLocal = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
-
 class Base(DeclarativeBase):
     pass
 
-async def get_db():
+def get_db():
     print("1. get_db Opening DB")
 
-    async with AsyncSessionLocal() as session:
+    with SessionLocal() as session:
         print("2. get_db Giving DB to endpoint")
         yield session
 

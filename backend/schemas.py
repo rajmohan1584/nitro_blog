@@ -1,7 +1,9 @@
 # from typing import Optional
 
 from datetime import datetime
-from pydantic import BaseModel, ConfigDict, Field, EmailStr
+
+from pydantic import BaseModel, ConfigDict, EmailStr, Field
+
 
 class UserBase(BaseModel):
     username: str = Field(min_length=1, max_length=50, description="The username of the user")
