@@ -3,13 +3,13 @@ from typing import Annotated
 
 import models
 from database import Base, engine, get_db
-from fastapi import FastAPI, HTTPException, Depends
+from fastapi import Depends, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.requests import Request
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.templating import Jinja2Templates
 from schemas import PostCreate, PostResponse, UserCreate, UserResponse
-from sqlalchemy import insert, select
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 from starlette.staticfiles import StaticFiles
 
@@ -80,7 +80,7 @@ def create_user(
     if existing_user:
         raise HTTPException(status_code=400, detail="User already exists")
 
-    result = db.execute(insert(models.User).values(username=user.username, email=user.email))
+    result = db.execute(select(models.User).where(models.User.email == user.email))
     existing_email = result.scalars().first()
 
     if existing_email:
@@ -131,6 +131,18 @@ def get_post(
         raise HTTPException(status_code=404, detail=f"Post with id {post_id} not found")
     return post
 
+@app.post("/posts", response_model=PostResponse)
+def create_post(post: PostCreate, db: Annotated[Session, Depends(get_db)]) -> PostResponse:
+    result = db.execute(select(models.User).where(models.User.id == post.user_id))
+    user = result.scalars().first()
+    if not user:
+        raise HTTPException(status_code=404, detail=f"User with id {post.user_id} not found")
+
+    new_post = models.Post(title=post.title, content=post.content, user_id=user.id)
+    db.add(new_post)
+    db.commit()
+    db.refresh(new_post)
+    return new_post
 
 ###########################################################################
 # Post routes OLD

@@ -21,7 +21,7 @@ class UserResponse(UserBase):
 class PostBase(BaseModel):
     title: str = Field(min_length=1, max_length=100, description="The title of the post")
     content: str = Field(min_length=1, description="The content of the post")
-    author: str = Field(min_length=1, description="The author of the post")
+    #author: str = Field(min_length=1, description="The author of the post")
 
     model_config = ConfigDict(extra="forbid")
 
