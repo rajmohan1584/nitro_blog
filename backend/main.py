@@ -144,6 +144,29 @@ def create_post(post: PostCreate, db: Annotated[Session, Depends(get_db)]) -> Po
     db.refresh(new_post)
     return new_post
 
+@app.put("/posts/{post_id}", response_model=PostResponse)
+def update_post(post_id: int, post_data: PostCreate, db: Annotated[Session, Depends(get_db)]) -> PostResponse:
+    result = db.execute(select(models.Post).where(models.Post.id == post_id))
+    post = result.scalars().first()
+    if not post:
+        raise HTTPException(status_code=404, detail=f"Post with id {post_id} not found")
+
+    result = db.execute(select(models.User).where(models.User.id == post_data.user_id))
+    user = result.scalars().first()
+    if not user:
+        raise HTTPException(
+            status_code=404, detail=f"User with id {post_data.user_id} not found"
+        )
+
+    post.user_id = user.id
+    post.title = post_data.title
+    post.content = post_data.content
+    post.date_posted = datetime.now(timezone.utc)
+    
+    db.commit()
+    db.refresh(post)
+    return post
+
 ###########################################################################
 # Post routes OLD
 ###########################################################################
