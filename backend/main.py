@@ -187,6 +187,14 @@ def patch_post(
     db.refresh(post)
     return post
 
+@app.delete("/posts/{post_id}", status_code=204)
+def delete_post(post_id: int, db: Annotated[Session, Depends(get_db)]):
+    result = db.execute(select(models.Post).where(models.Post.id == post_id))
+    post = result.scalars().first()
+    if not post:
+        raise HTTPException(status_code=404, detail=f"Post with id {post_id} not found")
+    db.delete(post)
+    db.commit()
 
 ###########################################################################
 # Post routes OLD
