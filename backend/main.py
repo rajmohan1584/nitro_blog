@@ -8,7 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.requests import Request
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.templating import Jinja2Templates
-from schemas import PostCreate, PostResponse, UserCreate, UserResponse
+from schemas import PostCreate, PostPatch, PostResponse, UserCreate, UserResponse
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 from starlette.staticfiles import StaticFiles
@@ -166,6 +166,27 @@ def update_post(post_id: int, post_data: PostCreate, db: Annotated[Session, Depe
     db.commit()
     db.refresh(post)
     return post
+
+@app.patch("/posts/{post_id}", response_model=PostResponse)
+def patch_post(
+    post_id: int, post_data: PostPatch, db: Annotated[Session, Depends(get_db)]
+) -> PostResponse:
+    result = db.execute(select(models.Post).where(models.Post.id == post_id))
+    post = result.scalars().first()
+    if not post:
+        raise HTTPException(status_code=404, detail=f"Post with id {post_id} not found")
+    
+    update_data = post_data.model_dump(exclude_unset=True)
+
+    for field, value in update_data.items():
+        setattr(post, field, value)
+
+    post.date_posted = datetime.now(timezone.utc)
+
+    db.commit()
+    db.refresh(post)
+    return post
+
 
 ###########################################################################
 # Post routes OLD

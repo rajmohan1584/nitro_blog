@@ -32,6 +32,9 @@ class PostBase(BaseModel):
 class PostCreate(PostBase):
     user_id: int = Field(..., description="The ID of the user (TODO: Get from Session)")
 
+class PostPatch(PostBase):
+    title: str | None = Field(default=None, min_length=1, max_length=100, description="The title of the post")
+    content: str | None = Field(default=None, min_length=1, description="The content of the post")
 
 class PostResponse(PostBase):
     model_config = ConfigDict(from_attributes=True)
