@@ -8,7 +8,14 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.requests import Request
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.templating import Jinja2Templates
-from schemas import PostCreate, PostPatch, PostResponse, UserCreate, UserResponse
+from schemas import (
+    PostCreate,
+    PostPatch,
+    PostResponse,
+    UserCreate,
+    UserPatch,
+    UserResponse,
+)
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 from starlette.staticfiles import StaticFiles
@@ -92,6 +99,11 @@ def create_user(
     db.refresh(new_user)
     return new_user
 
+@app.get("/users", response_model=list[UserResponse])
+def get_users(db: Annotated[Session, Depends(get_db)]) -> list[UserResponse]:
+    result = db.execute(select(models.User))
+    users = result.scalars().all()
+    return users
 
 @app.get("/users/{user_id}", response_model=UserResponse)
 def get_user(user_id: int, db: Annotated[Session, Depends(get_db)]) -> UserResponse:
@@ -100,6 +112,46 @@ def get_user(user_id: int, db: Annotated[Session, Depends(get_db)]) -> UserRespo
     if not user:
         raise HTTPException(status_code=404, detail=f"User with id {user_id} not found")
     return user
+
+@app.patch("/users/{user_id}", response_model=UserResponse)
+def patch_user(user_id: int, user_data: UserPatch, db: Annotated[Session, Depends(get_db)]) -> UserResponse:
+    result = db.execute(select(models.User).where(models.User.id == user_id))
+    user = result.scalars().first()
+    if not user:
+        raise HTTPException(status_code=404, detail=f"User with id {user_id} not found")
+
+    if (user_data.username is not None and user_data.username != user.username):
+        result = db.execute(select(models.User).where(models.User.username == user_data.username))
+        existing_user = result.scalars().first()
+        if existing_user:
+            raise HTTPException(status_code=400, detail="Username already exists")
+
+    if (user_data.email is not None and user_data.email != user.email):
+        result = db.execute(select(models.User).where(models.User.email == user_data.email))
+        existing_email = result.scalars().first()
+        if existing_email:
+            raise HTTPException(status_code=400, detail="Email already exists")
+
+    if user_data.username is not None:
+        user.username = user_data.username
+    if user_data.email is not None:
+        user.email = user_data.email
+    if user_data.image_file is not None:
+        user.image_file = user_data.image_file
+
+    db.commit()
+    db.refresh(user)
+
+    return user
+
+@app.delete("/users/{user_id}", status_code=204)
+def delete_user(user_id: int, db: Annotated[Session, Depends(get_db)]):
+    result = db.execute(select(models.User).where(models.User.id == user_id))
+    user = result.scalars().first()
+    if not user:
+        raise HTTPException(status_code=404, detail=f"User with id {user_id} not found")
+    db.delete(user)
+    db.commit()
 
 @app.get("/users/{user_id}/posts", response_model=list[PostResponse])
 def get_user_posts(user_id: int, db: Annotated[Session, Depends(get_db)]) -> list[PostResponse]:
@@ -110,7 +162,9 @@ def get_user_posts(user_id: int, db: Annotated[Session, Depends(get_db)]) -> lis
 
     result = db.execute(select(models.Post).where(models.Post.user_id == user_id))
     posts = result.scalars().all()
+
     return posts
+
 
 ###########################################################################
 # Post routes
@@ -142,6 +196,7 @@ def create_post(post: PostCreate, db: Annotated[Session, Depends(get_db)]) -> Po
     db.add(new_post)
     db.commit()
     db.refresh(new_post)
+
     return new_post
 
 @app.put("/posts/{post_id}", response_model=PostResponse)

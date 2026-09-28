@@ -12,6 +12,19 @@ class UserBase(BaseModel):
 class UserCreate(UserBase):
     pass
 
+class UserPatch(UserBase):
+    username: str | None = Field(default=None, min_length=1, max_length=50, description="The username of the user")
+    email: EmailStr | None = Field(default=None, max_length=120, description="The email of the user")
+    image_file: str | None = Field(
+        default=None,
+        min_length=1,
+        max_length=20,
+        description="The image file of the user",
+        pattern=r"^[a-zA-Z0-9_-]+\.[a-zA-Z0-9_-]+$",
+        example="profile.jpg"
+    )
+
+
 class UserResponse(UserBase):
     model_config = ConfigDict(from_attributes=True)
     id: int = Field(..., description="The ID of the user")
