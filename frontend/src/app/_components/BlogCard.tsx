@@ -2,8 +2,11 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import "./BlogCard.css";
 import Button from "@/components/Button";
+import { useState } from "react";
+import ConfirmDialog from "@/components/ConfirmDialog";
 
 export default function BlogCard({ post }: { post: any }) {
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const router = useRouter();
   return (
     <div className="blog-card">
@@ -26,8 +29,9 @@ export default function BlogCard({ post }: { post: any }) {
         />
         {post.author?.username}
         <Button text="Edit" variant="primary" className="ml-2" />
-        <Button text="Delete" variant="danger" className="ml-2" />
+        <Button text="Delete" variant="danger" className="ml-2" onClick={() => setShowDeleteDialog(true)} />
       </div>
+      {showDeleteDialog && <ConfirmDialog onOk={() => {}} onCancel={() => setShowDeleteDialog(false)} />}
     </div>
   );
 }

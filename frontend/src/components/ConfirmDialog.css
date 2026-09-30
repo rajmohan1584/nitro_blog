@@ -1,0 +1,27 @@
+@reference "../app/globals.css";
+
+.confirm-dialog-overlay {
+  @apply fixed inset-0 z-50 flex items-center justify-center bg-black/50;
+}
+
+.confirm-dialog {
+  @apply w-full max-w-md rounded-lg
+         bg-white text-zinc-900 shadow-xl
+         dark:bg-zinc-900 dark:text-zinc-100;
+}
+
+.confirm-dialog-title {
+  @apply border-b border-zinc-200 px-6 py-4
+         text-lg font-semibold
+         dark:border-zinc-700;
+}
+
+.confirm-dialog-body {
+  @apply px-6 py-6;
+}
+
+.confirm-dialog-footer {
+  @apply flex justify-end gap-2
+         border-t border-zinc-200 px-6 py-4
+         dark:border-zinc-700;
+}
