@@ -1,0 +1,44 @@
+@reference "../globals.css";
+
+.blog-input-dialog-overlay {
+  @apply fixed inset-0 z-50 flex items-center justify-center bg-black/50;
+}
+
+.blog-input-dialog {
+  @apply w-full max-w-md rounded-lg
+         bg-white text-zinc-900 shadow-xl
+         dark:bg-zinc-900 dark:text-zinc-100;
+}
+
+.blog-input-dialog-title {
+  @apply border-b border-zinc-200 px-6 py-4
+         text-lg font-semibold
+         dark:border-zinc-700;
+}
+
+.blog-input-dialog-body {
+  @apply flex flex-col gap-1 px-6 py-6;
+}
+
+.blog-input-dialog-label {
+  @apply mt-3 text-xs font-medium text-zinc-500
+         first:mt-0
+         dark:text-zinc-400;
+}
+
+.blog-input-dialog-input,
+.blog-input-dialog-textarea {
+  @apply rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900
+         focus:border-blue-500 focus:outline-none
+         dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100;
+}
+
+.blog-input-dialog-textarea {
+  @apply resize-none;
+}
+
+.blog-input-dialog-footer {
+  @apply flex justify-end gap-2
+         border-t border-zinc-200 px-6 py-4
+         dark:border-zinc-700;
+}

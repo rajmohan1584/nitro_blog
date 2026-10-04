@@ -4,10 +4,18 @@ import "./BlogCard.css";
 import Button from "@/components/Button";
 import { useState } from "react";
 import ConfirmDialog from "@/components/ConfirmDialog";
+import BlogInputDialog from "./BlogInputDialog";
 
 export default function BlogCard({ post }: { post: any }) {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [showEditDialog, setShowEditDialog] = useState(false);
   const router = useRouter();
+
+  const handleSave = (post: any) => {
+    console.log(post);
+    setShowEditDialog(false);
+  };
+
   return (
     <div className="blog-card">
       {/* Header */}
@@ -28,10 +36,13 @@ export default function BlogCard({ post }: { post: any }) {
           className="rounded-full object-cover"
         />
         {post.author?.username}
-        <Button text="Edit" variant="primary" className="ml-2" />
+        <Button text="Edit" variant="primary" className="ml-2" onClick={() => setShowEditDialog(true)} />
         <Button text="Delete" variant="danger" className="ml-2" onClick={() => setShowDeleteDialog(true)} />
       </div>
       {showDeleteDialog && <ConfirmDialog onOk={() => {}} onCancel={() => setShowDeleteDialog(false)} />}
+      {showEditDialog && (
+        <BlogInputDialog post={post} onOk={(post: any) => handleSave(post)} onCancel={() => setShowEditDialog(false)} />
+      )}
     </div>
   );
 }
