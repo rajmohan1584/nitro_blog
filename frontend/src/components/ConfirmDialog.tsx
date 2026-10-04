@@ -1,5 +1,6 @@
 "use client";
 
+import Button from "./Button";
 import "./ConfirmDialog.css";
 
 interface ConfirmDialogProps {
@@ -27,13 +28,8 @@ export default function ConfirmDialog({
         <div className="confirm-dialog-body">{message}</div>
 
         <div className="confirm-dialog-footer">
-          <button className="confirm-dialog-cancel" onClick={onCancel}>
-            {cancelText}
-          </button>
-
-          <button className="confirm-dialog-ok" onClick={onOk}>
-            {okText}
-          </button>
+          <Button text={cancelText} onClick={onCancel} variant="default" />
+          <Button text={okText} onClick={onOk} variant="danger" />
         </div>
       </div>
     </div>
